@@ -6,18 +6,17 @@ import dateparser
 import csv
 import re
 
-class SamplePlugin(Plugin):
-    """Sample plugin (for developers only)
+class IngPlugin(Plugin):
+    """Parser for ING Romania csv files.
     """
 
     def get_parser(self, filename):
-        return SampleParser(filename)
+        return IngParser(filename, self.settings)
 
-
-class SampleParser(StatementParser):
-    def __init__(self, filename):
+class IngParser(StatementParser):
+    def __init__(self, filename, settings):
         self.filename = filename
-
+        self.settings = settings
     def parse(self):
         """Main entry point for parsers
 
@@ -31,9 +30,8 @@ class SampleParser(StatementParser):
             date_index = self.get_index_from_first_line(field_names)
             (meta, raw_records)= self.merge_lines_on_field(date_index,field_names,lines[1:])
             lines = self.to_statement_line( raw_records)
-            #import pdb
-            #pdb.set_trace()
             statement= Statement()
+            statement.account_id = self.settings['iban']
             statement.lines = lines
             return statement
     def merge_lines_on_field(self,new_record_marker_idx,field_names,lines):
